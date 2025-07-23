@@ -3,7 +3,7 @@
   margin: 20px auto;
   font-family: Arial, sans-serif;
   text-align: center;
-  background-color: #ffe4ec;
+  background-color: #ffe4ec; /* pink background */
   padding: 20px;
   border-radius: 10px;
 }
@@ -41,22 +41,27 @@
 
 .status {
   margin: 1rem 0 0.5rem;
+  font-weight: bold;
 }
 
-.reset-button, .rules-toggle-btn {
+.reset-button,
+.rules-toggle-btn,
+.reset-scores-button {
   padding: 0.5rem 1rem;
   margin: 0.5rem 0;
   cursor: pointer;
   font-weight: bold;
   border-radius: 5px;
   border: none;
-  background-color: #ad1457; 
+  background-color: #ad1457; /* your pink */
   color: white;
   transition: background-color 0.3s ease;
 }
 
-.reset-button:hover, .rules-toggle-btn:hover {
-  background-color: #880e4f; 
+.reset-button:hover,
+.rules-toggle-btn:hover,
+.reset-scores-button:hover {
+  background-color: #880e4f; /* darker pink on hover */
 }
 
 .rules {
@@ -66,6 +71,8 @@
   margin-bottom: 1rem;
   border: 1px solid #ccc;
   border-radius: 5px;
+  max-height: 200px;
+  overflow-y: auto;
 }
 
 .scoreboard {
@@ -78,40 +85,73 @@
 
 .player-settings {
   display: flex;
-  justify-content: space-around;
+  flex-wrap: wrap;  /* allow wrapping */
+  justify-content: center;
+  gap: 15px;
   margin-bottom: 1rem;
+  text-align: left;
 }
 
 .player-settings label {
-  display: block;
-  margin-bottom: 0.3rem;
+  min-width: 140px;
+  display: flex;
+  flex-direction: column;
+  font-weight: 600;
 }
 
-.player-settings input {
-  padding: 4px 6px;
+.player-settings input[type="text"],
+.player-settings select {
+  padding: 6px;
   font-size: 1rem;
-  width: 130px;
   border: 1px solid #999;
   border-radius: 4px;
+  margin-top: 4px;
 }
 
-.mark-icon {
-  width: 30px;
-  height: 30px;
-  vertical-align: middle;
+.ai-toggle-label {
+  align-items: center;
+  display: flex;
+  font-weight: 600;
 }
 
-.selected-mark {
-  border: 2px solid green;
-  background-color: #a5d6a7;
-  cursor: pointer;
-  margin: 0 3px;
-  padding: 3px 6px;
-  border-radius: 5px;
+.ai-toggle-label input {
+  margin-right: 6px;
 }
 
-.selected-mark img {
-  width: 25px;
-  height: 25px;
+.ai-difficulty-label {
+  min-width: 160px;
+  font-weight: 600;
+  display: flex;
+  flex-direction: column;
 }
 
+.ai-difficulty-label select {
+  margin-top: 4px;
+}
+
+@media (max-width: 450px) {
+  .app-container {
+    width: 95%;
+  }
+
+  .player-settings {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .player-settings label {
+    min-width: auto;
+    width: 100%;
+  }
+
+  .board {
+    grid-template-columns: repeat(3, 70px);
+    gap: 6px;
+  }
+
+  .square {
+    width: 70px;
+    height: 70px;
+    font-size: 2rem;
+  }
+}

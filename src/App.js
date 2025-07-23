@@ -34,8 +34,41 @@ function Square({ value, onClick, highlight, disabled }) {
 }
 
 function getRandomMove(board) {
-  const empty = board.map((val, idx) => (val === null ? idx : null)).filter(Boolean);
+  const empty = board.map((val, idx) => (val === null ? idx : null)).filter(v => v !== null);
   return empty.length ? empty[Math.floor(Math.random() * empty.length)] : null;
+}
+
+function minimax(board, isMaximizing, player, opponent) {
+  const winner = checkWinner(board);
+  if (winner) {
+    if (winner.winner === player) return 10;
+    else if (winner.winner === opponent) return -10;
+  }
+  if (!board.includes(null)) return 0;
+
+  if (isMaximizing) {
+    let bestScore = -Infinity;
+    for (let i = 0; i < board.length; i++) {
+      if (board[i] === null) {
+        board[i] = player;
+        const score = minimax(board, false, player, opponent);
+        board[i] = null;
+        bestScore = Math.max(score, bestScore);
+      }
+    }
+    return bestScore;
+  } else {
+    let bestScore = Infinity;
+    for (let i = 0; i < board.length; i++) {
+      if (board[i] === null) {
+        board[i] = opponent;
+        const score = minimax(board, true, player, opponent);
+        board[i] = null;
+        bestScore = Math.min(score, bestScore);
+      }
+    }
+    return bestScore;
+  }
 }
 
 export default function App() {
@@ -96,12 +129,49 @@ export default function App() {
   useEffect(() => {
     if (playWithAI && !isXNext && !winnerInfo) {
       const timeout = setTimeout(() => {
-        const move = getRandomMove(board);
+        let move = null;
+        const player = "O";
+        const opponent = "X";
+
+        if (aiDifficulty === "hard") {
+          let bestScore = -Infinity;
+          for (let i = 0; i < board.length; i++) {
+            if (board[i] === null) {
+              board[i] = player;
+              const score = minimax(board, false, player, opponent);
+              board[i] = null;
+              if (score > bestScore) {
+                bestScore = score;
+                move = i;
+              }
+            }
+          }
+        } else if (aiDifficulty === "medium") {
+          if (Math.random() < 0.5) {
+            move = getRandomMove(board);
+          } else {
+            let bestScore = -Infinity;
+            for (let i = 0; i < board.length; i++) {
+              if (board[i] === null) {
+                board[i] = player;
+                const score = minimax(board, false, player, opponent);
+                board[i] = null;
+                if (score > bestScore) {
+                  bestScore = score;
+                  move = i;
+                }
+              }
+            }
+          }
+        } else {
+          move = getRandomMove(board);
+        }
+
         if (move !== null) handleClick(move);
-      }, 1000);
+      }, 700);
       return () => clearTimeout(timeout);
     }
-  }, [board, isXNext, winnerInfo, playWithAI]);
+  }, [board, isXNext, winnerInfo, playWithAI, aiDifficulty]);
 
   function handleClick(idx) {
     if (board[idx] || winnerInfo) return;
@@ -146,46 +216,60 @@ export default function App() {
     <div className="app-container">
       <h1>Faizoolaa's Tic Tac Toe</h1>
 
-      <button onClick={() => setShowRules((r) => !r)}>
+      <button className="rules-toggle-btn" onClick={() => setShowRules((r) => !r)}>
         {showRules ? "Hide Rules" : "Show Rules"}
       </button>
 
       {showRules && (
         <div className="rules">
-          <h3>Game Rules</h3>
+          <h3>Game Rules </h3>
           <ul>
-            <li>Get 3 in a row to win.</li>
-            <li>You have 10 seconds per turn.</li>
-            <li>Fail to play? Your turn is skipped.</li>
-            <li>AI plays if enabled.</li>
+            <li>This is a 3x3 battle arena where X’s and O’s fight for glory.</li>
+            <li>Take turns placing your marks!</li>
+            <li>Get three in a row horizontal, vertical, or diagonal and claim eternal bragging rights.</li>
+            <li>If the board fills up with no winner, it’s a tie..., everyone loses (except me, who’s judging you).</li>
+            <li>You’ve got 10 seconds per move, blink and you miss it, so don’t fall asleep!</li>
+            <li>Run out of time? Your opponent’s getting lucky with an extra turn. Shems!</li>
           </ul>
+          <p>Now go forth and conquer (or just have fun, no pressure) jokes Winnn!</p>
         </div>
       )}
 
       <div className="player-settings">
         <label>
           Player X Name:
-          <input value={playerXName} onChange={(e) => setPlayerXName(e.target.value)} />
+          <input
+            value={playerXName}
+            onChange={(e) => setPlayerXName(e.target.value)}
+            maxLength={12}
+          />
         </label>
+
         <label>
           Player O Name:
           <input
             value={playerOName}
             onChange={(e) => setPlayerOName(e.target.value)}
+            maxLength={12}
             disabled={playWithAI}
           />
         </label>
+
         <label>
           <input type="checkbox" checked={playWithAI} onChange={togglePlayWithAI} />
           Play against AI
         </label>
+
         {playWithAI && (
           <label>
             Difficulty:
-            <select value={aiDifficulty} onChange={(e) => setAiDifficulty(e.target.value)}>
-              <option value="easy">Easy</option>
-              <option value="medium">Medium</option>
-              <option value="hard">Hard</option>
+            <select
+              value={aiDifficulty}
+              onChange={(e) => setAiDifficulty(e.target.value)}
+            >
+              <option value="easy">easy</option>
+              <option value="medium">medium</option>
+              <option value="hard">hard</option>
             </select>
           </label>
         )}
@@ -203,17 +287,23 @@ export default function App() {
         ))}
       </div>
 
-      <h2>{status}</h2>
+      <h2 className="status">{status}</h2>
 
-      <button onClick={() => resetGame(false)}>Reset Game</button>
-      <button onClick={() => resetGame(true)} style={{ marginLeft: 10 }}>
+      <button className="reset-button" onClick={() => resetGame(false)}>
+        Reset Game
+      </button>
+      <button className="reset-scores-button" onClick={() => resetGame(true)} style={{ marginLeft: 10 }}>
         Reset Scores
       </button>
 
       <div className="scoreboard">
         <h3>Player Stats</h3>
-        <p>{playerXName}: {stats.X} wins</p>
-        <p>{playerOName}: {stats.O} wins</p>
+        <p>
+          {playerXName}: {stats.X} wins
+        </p>
+        <p>
+          {playerOName}: {stats.O} wins
+        </p>
         <p>Draws: {stats.Draw}</p>
         <p>Total games played: {stats.totalGames}</p>
       </div>

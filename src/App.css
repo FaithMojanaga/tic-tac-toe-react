@@ -115,20 +115,3 @@
   height: 25px;
 }
 
-.player-settings {
-  display: flex;
-  justify-content: center; 
-  gap: 1rem;
-  margin-bottom: 1rem;
-}
-
-.player-settings label {
-  white-space: nowrap;  
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.player-settings input[type="checkbox"] {
-  transform: scale(1.2);
-}

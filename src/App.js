@@ -218,10 +218,31 @@ export default function App() {
               checked={playWithAI}
               onChange={togglePlayWithAI}
             />{" "}
-            Play against AI
-          </label>
-        </div>
+            </label>
+
+        {playWithAI && (
+          <div>
+            <label>
+              Difficulty:{" "}
+              <select
+                value={aiDifficulty}
+                onChange={(e) => setAiDifficulty(e.target.value)}
+              >
+                <option value="easy">Easy</option>
+                <option value="medium">Medium</option>
+                <option value="hard">Hard</option>
+              </select>
+            </label>
+          </div>
+        )}
       </div>
+
+      <div className="board">
+        {board.map((v, i) => (
+          <Square key={i} value={v} onClick={() => handleClick(i)} />
+        ))}
+      </div>
+
 
       <div className="board">
         {board.map((val, idx) => {
